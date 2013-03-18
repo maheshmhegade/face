@@ -83,9 +83,9 @@ Tldrecognition::~Tldrecognition()
     delete d;
 }
 
-unitFaceModel* Tldrecognition::getModeltoStore(int *initBoundingBox) const
+pair<unitFaceModel*,IplImage*> Tldrecognition::getModeltoStore() const
 {
-    return d->tldinterfaceObject->generatefacemodel(initBoundingBox);
+    return d->tldinterfaceObject->generatefacemodel();
 }
 
 float Tldrecognition::getRecognitionConfidence( unitFaceModel* const comparemodel) const

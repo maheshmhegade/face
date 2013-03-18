@@ -18,7 +18,7 @@ class MainWindow : public QMainWindow
 public:
     int boundingBox[4];
     unitFaceModel* facemodeltostore;
-    liveVideo liveVideoObject;
+    liveVideo *liveVideoObject;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     
@@ -26,13 +26,7 @@ private slots:
 
     void on_saveFaceOnePB_clicked();
 
-    void on_saveFaceTwoPB_clicked();
-
-    void on_capturePB_clicked();
-
     void on_faceDetectPB_clicked();
-
-    void on_pushButton_clicked();
 
     void on_showLivePB_clicked();
 

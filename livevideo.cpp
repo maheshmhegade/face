@@ -8,48 +8,6 @@ liveVideo::~liveVideo()
 {
 }
 
-void liveVideo::detectFace(QGraphicsView *smallGraphicsObjectOne,QGraphicsView *smallGrahicsObjectTwo,int *boundingBox)
-{
-          playStatus = false;
-
-          allFaces = cvHaarDetectObjects( tmpImage, faceDetectCascade,
-                                          tmpStorageFaceDetect,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
-          if (allFaces->total >= 1)
-          {
-              CvRect * tmpFaceLocation = (CvRect *)cvGetSeqElem(allFaces,0);
-              boundingBox[0] = tmpFaceLocation->x;
-              boundingBox[1] = tmpFaceLocation->y;
-              boundingBox[2] = tmpFaceLocation->width;
-              boundingBox[3] = tmpFaceLocation->height;
-
-              cvSetImageROI( tmpImage,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
-              IplImage *faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),tmpImage->depth,
-                                                      tmpImage->nChannels);
-              cvCopy(tmpImage,faceToDisplay);
-              cvResetImageROI(tmpImage);
-              liveVideo::displayVideo(faceToDisplay,smallGraphicsObjectOne);
-          };
-
-          if (allFaces->total == 2)
-          {
-
-              CvRect * tmpFaceLocation = (CvRect *)cvGetSeqElem(allFaces,1);
-              cvSetImageROI( tmpImage,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
-              IplImage *faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),tmpImage->depth,
-                                                      tmpImage->nChannels);
-              cvCopy(tmpImage,faceToDisplay);
-              cvResetImageROI(tmpImage);
-              liveVideo::displayVideo(faceToDisplay,smallGrahicsObjectTwo);
-          }
-
-         /* else
-          {
-              smallGrahicsObjectTwo->scene()->clear();
-          }*/
-
-         playStatus = true;
-}
-
 void liveVideo::startCapture()
 {
        liveCapture = cvCaptureFromCAM(0);
@@ -76,13 +34,7 @@ void liveVideo::stopCapture()
 }
 void liveVideo::initliveVideo()
 {
-    faceDetectCascade = 0;
-    haarCascadePath = "/usr/share/apps/libkface/haarcascades/haarcascade_frontalface_alt.xml";
-    faceDetectCascade = (CvHaarClassifierCascade*)cvLoad( haarCascadePath, 0, 0, 0 );
-    liveCapture = 0;
-    playStatus = false;
-    tmpFace = 0;
-    tmpStorageFaceDetect = cvCreateMemStorage(0);
+
 }
 void liveVideo::displayVideo(IplImage *imagetoDisplay,QGraphicsView *graphicsObject)
 {

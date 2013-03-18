@@ -40,7 +40,8 @@
 #include "Settings.h"
 #include "ImAcq.h"
 #include "Gui.h"
-
+#include <iostream>
+using namespace std;
 using tld::Gui;
 using tld::Settings;
 
@@ -54,7 +55,7 @@ public:
     Tldrecognition();
    ~Tldrecognition();
 
-    unitFaceModel* getModeltoStore(int *) const;
+    pair<unitFaceModel*,IplImage*> getModeltoStore() const;
 
     int updateDatabase(IplImage* const, const char* const) const;
 

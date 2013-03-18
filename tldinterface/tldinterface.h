@@ -30,6 +30,9 @@
 #include "TLD.h"
 #include "ImAcq.h"
 #include "Gui.h"
+#include <iostream>
+
+using namespace  std;
 
 using namespace libface;
 
@@ -60,6 +63,12 @@ public:
     const char *modelExportFile;
     int seed;
 
+    IplImage *tmpFace;
+    const char *haarCascadePath;
+    CvSeq *allFaces;
+    CvMemStorage *tmpStorageFaceDetect;
+    CvHaarClassifierCascade *faceDetectCascade;
+
     tldinterface()
     {
         tld = new tld::TLD();
@@ -88,7 +97,7 @@ public:
         delete tld;
         imAcqFree(imAcq);
     }
-    unitFaceModel *generatefacemodel(int* );
+    pair<unitFaceModel *,IplImage *> generatefacemodel();
     float getrecognitionconfidence(unitFaceModel *comparemodel);
 };
 

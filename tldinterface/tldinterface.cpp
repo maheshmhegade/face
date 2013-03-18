@@ -23,25 +23,44 @@
  *      Author: Georg Nebehay
  */
 
-#include <iostream>
 #include "tldinterface.h"
 
 #include "ImAcq.h"
 #include "Gui.h"
 #include "TLDUtil.h"
 
-using namespace std;
 using namespace tld;
 using namespace cv;
 
-unitFaceModel *tldinterface::generatefacemodel(int *boundingBox)
+pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 {
     IplImage *img;
-    for (int i = 0 ;i < 5 ;i++)//intentionally introduced delay to get clear image
+    for (int i = 0 ;i < 2 ;i++)//intentionally introduced delay to get clear image
     {
         img = imAcqGetImg(imAcq);
         cvWaitKey(30);
     }
+    //detect face first
+    haarCascadePath = "/usr/share/apps/libkface/haarcascades/haarcascade_frontalface_alt.xml";
+    faceDetectCascade = (CvHaarClassifierCascade*)cvLoad( haarCascadePath, 0, 0, 0 );
+    tmpStorageFaceDetect = cvCreateMemStorage(0);
+
+    allFaces = cvHaarDetectObjects( img, faceDetectCascade,
+                                    tmpStorageFaceDetect,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+
+    CvRect * tmpFaceLocation = (CvRect *)cvGetSeqElem(allFaces,0);
+    int boundingBox[4];
+    boundingBox[0] = tmpFaceLocation->x;
+    boundingBox[1] = tmpFaceLocation->y;
+    boundingBox[2] = tmpFaceLocation->width;
+    boundingBox[3] = tmpFaceLocation->height;
+
+    cvSetImageROI( img,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
+    IplImage *faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),img->depth,
+                                            img->nChannels);
+    cvCopy(img,faceToDisplay);
+    cvResetImageROI(img);
+
     Mat grey(img->height, img->width, CV_8UC1);
     cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
 
@@ -60,7 +79,7 @@ unitFaceModel *tldinterface::generatefacemodel(int *boundingBox)
     reuseFrameOnce = true;
 
     int numTrainImages = 0;
-    while(imAcqHasMoreFrames(imAcq) && numTrainImages < 150)
+    while(imAcqHasMoreFrames(imAcq) && numTrainImages < 30)
     {
         numTrainImages++;
         double tic = cvGetTickCount();
@@ -218,7 +237,8 @@ unitFaceModel *tldinterface::generatefacemodel(int *boundingBox)
             reuseFrameOnce = false;
         }
     }
-    return tld->putObjModel();
+    unitFaceModel *facemodel = tld->putObjModel();
+    return make_pair(facemodel,faceToDisplay);
 }
 
 float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
