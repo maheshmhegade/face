@@ -20,7 +20,7 @@ public:
     void initliveVideo();
     void togglePlayStatus();
     void startCapture();
-    void detectFace(QGraphicsView *,QGraphicsView *);
+    void detectFace(QGraphicsView *, QGraphicsView *, int *boundingBox);
     void displayVideo(IplImage*, QGraphicsView *);
     void stopCapture();
 

@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include "livevideo.h"
+#include "tldrecognition.h"
+
+using namespace libface;
 
 namespace Ui {
 class MainWindow;
@@ -13,7 +16,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-
+    int boundingBox[4];
     liveVideo liveVideoObject;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

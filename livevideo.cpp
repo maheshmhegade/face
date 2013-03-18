@@ -8,7 +8,7 @@ liveVideo::~liveVideo()
 {
 }
 
-void liveVideo::detectFace(QGraphicsView *smallGraphicsObjectOne,QGraphicsView *smallGrahicsObjectTwo)
+void liveVideo::detectFace(QGraphicsView *smallGraphicsObjectOne,QGraphicsView *smallGrahicsObjectTwo,int *boundingBox)
 {
           playStatus = false;
 
@@ -17,6 +17,11 @@ void liveVideo::detectFace(QGraphicsView *smallGraphicsObjectOne,QGraphicsView *
           if (allFaces->total >= 1)
           {
               CvRect * tmpFaceLocation = (CvRect *)cvGetSeqElem(allFaces,0);
+              boundingBox[0] = tmpFaceLocation->x;
+              boundingBox[1] = tmpFaceLocation->y;
+              boundingBox[2] = tmpFaceLocation->width;
+              boundingBox[3] = tmpFaceLocation->height;
+
               cvSetImageROI( tmpImage,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
               IplImage *faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),tmpImage->depth,
                                                       tmpImage->nChannels);

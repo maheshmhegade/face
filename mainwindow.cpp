@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <iostream>
+
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -40,7 +43,12 @@ void MainWindow::on_capturePB_clicked()
 
 void MainWindow::on_faceDetectPB_clicked()
 {
-    liveVideoObject.detectFace(ui->faceOneGV,ui->faceTwoGV);
+    liveVideoObject.detectFace(ui->faceOneGV,ui->faceTwoGV,boundingBox);
+
+    liveVideoObject.togglePlayStatus();
+    liveVideoObject.stopCapture();
+    Tldrecognition* const tmpTLD          = new Tldrecognition;
+    unitFaceModel* const facemodeltostore = tmpTLD->getModeltoStore(boundingBox);
 }
 
 void MainWindow::on_showLivePB_clicked()

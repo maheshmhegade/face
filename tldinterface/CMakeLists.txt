@@ -1,0 +1,17 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../opentld/opentld/main
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../opentld/libopentld/tld
+                    )
+INCLUDE_DIRECTORIES(${QDBUS_INCLUDE_DIRS} ${KDE4_INCLUDES})
+
+add_library(tldinterface    tldinterface.cpp
+                            tlddatabase.cpp
+                            tldface.cpp
+                            tldrecognition.cpp
+
+                            tldinterface.h
+                            tlddatabase.h
+                            tldface.h
+                            tldrecognition.h
+                            )
+
+target_link_libraries(tldinterface main libopentld cvblobs sqlite3 QtSql ${OpenCV_LIBS})
