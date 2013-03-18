@@ -98,7 +98,7 @@ public:
         imAcqFree(imAcq);
     }
     pair<unitFaceModel *,IplImage *> generatefacemodel();
-    float getrecognitionconfidence(unitFaceModel *comparemodel);
+    float getrecognitionconfidence(unitFaceModel *const comparemodel);
 };
 
 #endif /* TLDINTERFACE_H_ */

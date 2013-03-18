@@ -53,3 +53,5 @@ target_link_libraries(face    ${OpenCV_LIBS}
                               sqlite3
                               QtSql
                               )
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/haarcascade_frontalface_alt.xml"
+                   "${CMAKE_CURRENT_BINARY_DIR}/haarcascade_frontalface_alt.xml")

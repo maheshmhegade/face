@@ -34,6 +34,7 @@ using namespace cv;
 
 pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 {
+    showOutput = false;
     IplImage *img;
     for (int i = 0 ;i < 2 ;i++)//intentionally introduced delay to get clear image
     {
@@ -41,7 +42,7 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
         cvWaitKey(30);
     }
     //detect face first
-    haarCascadePath = "/usr/share/apps/libkface/haarcascades/haarcascade_frontalface_alt.xml";
+    haarCascadePath = "haarcascade_frontalface_alt.xml";
     faceDetectCascade = (CvHaarClassifierCascade*)cvLoad( haarCascadePath, 0, 0, 0 );
     tmpStorageFaceDetect = cvCreateMemStorage(0);
 
@@ -110,124 +111,6 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 
         toc = toc / 1000000;
 
-        float fps = 1 / toc;
-
-        int confident = (tld->currConf >= threshold) ? 1 : 0;
-
-        if(showOutput || saveDir != NULL)
-        {
-            char string[128];
-
-            char learningString[10] = "";
-
-            if(tld->learning)
-            {
-                strcpy(learningString, "Learning");
-            }
-
-            sprintf(string, "#%d,Posterior %.2f; fps: %.2f, #numwindows:%d, %s", imAcq->currentFrame - 1, tld->currConf, fps, tld->detectorCascade->numWindows, learningString);
-            CvScalar yellow = CV_RGB(255, 255, 0);
-            CvScalar blue = CV_RGB(0, 0, 255);
-            CvScalar black = CV_RGB(0, 0, 0);
-            CvScalar white = CV_RGB(255, 255, 255);
-
-            if(tld->currBB != NULL)
-            {
-                CvScalar rectangleColor = (confident) ? blue : yellow;
-                cvRectangle(img, tld->currBB->tl(), tld->currBB->br(), rectangleColor, 8, 8, 0);
-            }
-
-            CvFont font;
-            cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, .5, .5, 0, 1, 8);
-            cvRectangle(img, cvPoint(0, 0), cvPoint(img->width, 50), black, CV_FILLED, 8, 0);
-            cvPutText(img, string, cvPoint(25, 25), &font, white);
-
-            if(showForeground)
-            {
-
-                for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList->size(); i++)
-                {
-                    Rect r = tld->detectorCascade->detectionResult->fgList->at(i);
-                    cvRectangle(img, r.tl(), r.br(), white, 1);
-                }
-
-            }
-
-
-            if(showOutput)
-            {
-                gui->showImage(img);
-                char key = gui->getKey();
-
-                if(key == 'q') break;
-
-                if(key == 'b')
-                {
-
-                    ForegroundDetector *fg = tld->detectorCascade->foregroundDetector;
-
-                    if(fg->bgImg.empty())
-                    {
-                        fg->bgImg = grey.clone();
-                    }
-                    else
-                    {
-                        fg->bgImg.release();
-                    }
-                }
-
-                if(key == 'c')
-                {
-                    //clear everything
-                    tld->release();
-                }
-
-                if(key == 'l')
-                {
-                    tld->learningEnabled = !tld->learningEnabled;
-                    printf("LearningEnabled: %d\n", tld->learningEnabled);
-                }
-
-                if(key == 'a')
-                {
-                    tld->alternating = !tld->alternating;
-                    printf("alternating: %d\n", tld->alternating);
-                }
-
-                if(key == 'e')
-                {
-                    tld->writeToFile(modelExportFile);
-                }
-
-                if(key == 'i')
-                {
-                    tld->readFromFile(modelPath);
-                }
-
-                if(key == 'r')
-                {
-                    CvRect box;
-
-                    if(getBBFromUser(img, box, gui) == PROGRAM_EXIT)
-                    {
-                        break;
-                    }
-
-                    Rect r = Rect(box);
-
-                    tld->selectObject(grey, &r);
-                }
-            }
-
-            if(saveDir != NULL)
-            {
-                char fileName[256];
-                sprintf(fileName, "%s/%.5d.png", saveDir, imAcq->currentFrame - 1);
-
-//                cvSaveImage(fileName, img);
-            }
-        }
-
         if(!reuseFrameOnce)
         {
             cvReleaseImage(&img);
@@ -241,7 +124,7 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
     return make_pair(facemodel,faceToDisplay);
 }
 
-float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
+float tldinterface::getrecognitionconfidence(unitFaceModel * const comparemodel)
 {
     IplImage *img = imAcqGetImg(imAcq);
     Mat grey(img->height, img->width, CV_8UC1);
@@ -254,8 +137,14 @@ float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
     bool reuseFrameOnce = false;
     bool skipProcessingOnce = false;
 
+    char facename[15] = "";
+    strcpy(facename ,qPrintable(comparemodel->Name));
+
     tld->getObjModel(comparemodel);
     reuseFrameOnce = true;
+
+    char string[128];
+
 
     int numTrainImages = 0;
     while(imAcqHasMoreFrames(imAcq) && numTrainImages < 150)
@@ -295,16 +184,7 @@ float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
 
         if(showOutput || saveDir != NULL)
         {
-            char string[128];
-
-            char learningString[10] = "";
-
-            if(tld->learning)
-            {
-                strcpy(learningString, "Learning");
-            }
-
-            sprintf(string, "#%d,Posterior %.2f; fps: %.2f, #numwindows:%d, %s", imAcq->currentFrame - 1, tld->currConf, fps, tld->detectorCascade->numWindows, learningString);
+            sprintf(string, "Hey %s Are you infront of me???", facename);
             CvScalar yellow = CV_RGB(255, 255, 0);
             CvScalar blue = CV_RGB(0, 0, 255);
             CvScalar black = CV_RGB(0, 0, 0);
@@ -397,14 +277,6 @@ float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
                     tld->selectObject(grey, &r);
                 }
             }
-
-            if(saveDir != NULL)
-            {
-                char fileName[256];
-                sprintf(fileName, "%s/%.5d.png", saveDir, imAcq->currentFrame - 1);
-
-//                cvSaveImage(fileName, img);
-            }
         }
 
         if(!reuseFrameOnce)
@@ -419,7 +291,7 @@ float tldinterface::getrecognitionconfidence(unitFaceModel *comparemodel)
 
     if(exportModelAfterRun)
     {
-//        tld->writeToFile(modelExportFile);
+        //        tld->writeToFile(modelExportFile);
     }
     return 0.34;
 }

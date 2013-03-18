@@ -22,6 +22,7 @@ void MainWindow::on_saveFaceOnePB_clicked()
 {
     Tlddatabase *tlddatabase = new Tlddatabase;
     facemodeltostore->Name = ui->faceOneLE->text();
+    cout << qPrintable(facemodeltostore->Name) << endl;
     tlddatabase->insertFaceModel(facemodeltostore);
     delete tlddatabase;
 
@@ -43,6 +44,7 @@ void MainWindow::on_showLivePB_clicked()
     for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
     {
         unitFaceModel* const comparemodel = tlddatabase->getFaceModel(i);
+        cout << qPrintable(comparemodel->Name)<< endl;
         Tldrecognition* const tmpTLD      = new Tldrecognition;
         tmpTLD->getRecognitionConfidence(comparemodel);
         delete tmpTLD;

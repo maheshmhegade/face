@@ -45,7 +45,7 @@ void Tlddatabase::openFaceDatabase()
 {
     faceDatabase = QSqlDatabase::addDatabase("QSQLITE");
 
-    faceDatabase.setDatabaseName("/home/mmh/faceDatabase.db");
+    faceDatabase.setDatabaseName("faceDatabase.db");
 
     faceDatabase.open();
 }
