@@ -78,7 +78,8 @@ Tldrecognition::Tldrecognition()
 
 Tldrecognition::~Tldrecognition()
 {
-//    delete d->main;
+    delete d->tldinterfaceObject;
+    delete d->gui;
     delete d;
 }
 
@@ -87,9 +88,9 @@ unitFaceModel* Tldrecognition::getModeltoStore(int *initBoundingBox) const
     return d->tldinterfaceObject->generatefacemodel(initBoundingBox);
 }
 
-float Tldrecognition::getRecognitionConfidence(IplImage* const inputImage, unitFaceModel* const comparemodel) const
+float Tldrecognition::getRecognitionConfidence( unitFaceModel* const comparemodel) const
 {
-    return d->tldinterfaceObject->getrecognitionconfidence(inputImage, comparemodel);
+    return d->tldinterfaceObject->getrecognitionconfidence(comparemodel);
 }
 
 int Tldrecognition::updateDatabase(IplImage* const /*inputImage*/, const char* const /*faceModelFilename*/) const

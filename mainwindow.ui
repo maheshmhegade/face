@@ -38,7 +38,7 @@
           <item>
            <widget class="QPushButton" name="showLivePB">
             <property name="text">
-             <string>Show LIve</string>
+             <string>Show Live</string>
             </property>
            </widget>
           </item>
@@ -67,7 +67,7 @@
            <widget class="QGraphicsView" name="faceOneGV"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="faceOneLE"/>
           </item>
           <item>
            <widget class="QPushButton" name="saveFaceOnePB">
@@ -84,7 +84,7 @@
            <widget class="QGraphicsView" name="faceTwoGV"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit_2"/>
+           <widget class="QLineEdit" name="faceTwoLE"/>
           </item>
           <item>
            <widget class="QPushButton" name="saveFaceTwoPB">

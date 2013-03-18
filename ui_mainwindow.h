@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sun Mar 17 23:16:14 2013
+** Created: Mon Mar 18 20:52:33 2013
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,16 +39,16 @@ public:
     QVBoxLayout *controlLO;
     QPushButton *capturePB;
     QPushButton *faceDetectPB;
-    QPushButton *pushButton_5;
+    QPushButton *showLivePB;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *faceOneLO;
     QGraphicsView *faceOneGV;
-    QLineEdit *lineEdit;
+    QLineEdit *faceOneLE;
     QPushButton *saveFaceOnePB;
     QVBoxLayout *faceTwoLO;
     QGraphicsView *faceTwoGV;
-    QLineEdit *lineEdit_2;
+    QLineEdit *faceTwoLE;
     QPushButton *saveFaceTwoPB;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
@@ -84,10 +84,10 @@ public:
 
         controlLO->addWidget(faceDetectPB);
 
-        pushButton_5 = new QPushButton(centralWidget);
-        pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
+        showLivePB = new QPushButton(centralWidget);
+        showLivePB->setObjectName(QString::fromUtf8("showLivePB"));
 
-        controlLO->addWidget(pushButton_5);
+        controlLO->addWidget(showLivePB);
 
 
         verticalLayout_2->addLayout(controlLO);
@@ -110,10 +110,10 @@ public:
 
         faceOneLO->addWidget(faceOneGV);
 
-        lineEdit = new QLineEdit(centralWidget);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        faceOneLE = new QLineEdit(centralWidget);
+        faceOneLE->setObjectName(QString::fromUtf8("faceOneLE"));
 
-        faceOneLO->addWidget(lineEdit);
+        faceOneLO->addWidget(faceOneLE);
 
         saveFaceOnePB = new QPushButton(centralWidget);
         saveFaceOnePB->setObjectName(QString::fromUtf8("saveFaceOnePB"));
@@ -131,10 +131,10 @@ public:
 
         faceTwoLO->addWidget(faceTwoGV);
 
-        lineEdit_2 = new QLineEdit(centralWidget);
-        lineEdit_2->setObjectName(QString::fromUtf8("lineEdit_2"));
+        faceTwoLE = new QLineEdit(centralWidget);
+        faceTwoLE->setObjectName(QString::fromUtf8("faceTwoLE"));
 
-        faceTwoLO->addWidget(lineEdit_2);
+        faceTwoLO->addWidget(faceTwoLE);
 
         saveFaceTwoPB = new QPushButton(centralWidget);
         saveFaceTwoPB->setObjectName(QString::fromUtf8("saveFaceTwoPB"));
@@ -172,7 +172,7 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
         capturePB->setText(QApplication::translate("MainWindow", "Start/Stop Capture", 0, QApplication::UnicodeUTF8));
         faceDetectPB->setText(QApplication::translate("MainWindow", "Detect Face", 0, QApplication::UnicodeUTF8));
-        pushButton_5->setText(QApplication::translate("MainWindow", "Show LIve", 0, QApplication::UnicodeUTF8));
+        showLivePB->setText(QApplication::translate("MainWindow", "Show Live", 0, QApplication::UnicodeUTF8));
         saveFaceOnePB->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
         saveFaceTwoPB->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

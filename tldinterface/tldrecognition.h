@@ -58,7 +58,7 @@ public:
 
     int updateDatabase(IplImage* const, const char* const) const;
 
-    float getRecognitionConfidence(IplImage* const, unitFaceModel* const comparemodel) const;
+    float getRecognitionConfidence(unitFaceModel* const comparemodel) const;
 
 private:
 

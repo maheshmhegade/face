@@ -15,7 +15,9 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${KDE4_ENABLE_EXCEPTIONS})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS}
+INCLUDE_DIRECTORIES(${QDBUS_INCLUDE_DIRS}
+                    ${KDE4_INCLUDES}
+                    ${OpenCV_INCLUDE_DIRS}
                     ${CMAKE_CURRENT_SOURCE_DIR}/opentld/3rdparty/cvblobs
                     ${CMAKE_CURRENT_SOURCE_DIR}/opentld/libopentld/imacq
                     ${CMAKE_CURRENT_SOURCE_DIR}/opentld/libopentld/mftracker
