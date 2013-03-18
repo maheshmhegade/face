@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Mon Mar 18 20:52:33 2013
+** Created: Mon Mar 18 23:04:37 2013
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -37,7 +37,6 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *controlLO;
-    QPushButton *capturePB;
     QPushButton *faceDetectPB;
     QPushButton *showLivePB;
     QSpacerItem *verticalSpacer;
@@ -46,10 +45,6 @@ public:
     QGraphicsView *faceOneGV;
     QLineEdit *faceOneLE;
     QPushButton *saveFaceOnePB;
-    QVBoxLayout *faceTwoLO;
-    QGraphicsView *faceTwoGV;
-    QLineEdit *faceTwoLE;
-    QPushButton *saveFaceTwoPB;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -58,7 +53,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(669, 329);
+        MainWindow->resize(329, 261);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         verticalLayout = new QVBoxLayout(centralWidget);
@@ -74,11 +69,6 @@ public:
         controlLO = new QVBoxLayout();
         controlLO->setSpacing(6);
         controlLO->setObjectName(QString::fromUtf8("controlLO"));
-        capturePB = new QPushButton(centralWidget);
-        capturePB->setObjectName(QString::fromUtf8("capturePB"));
-
-        controlLO->addWidget(capturePB);
-
         faceDetectPB = new QPushButton(centralWidget);
         faceDetectPB->setObjectName(QString::fromUtf8("faceDetectPB"));
 
@@ -123,27 +113,6 @@ public:
 
         horizontalLayout->addLayout(faceOneLO);
 
-        faceTwoLO = new QVBoxLayout();
-        faceTwoLO->setSpacing(6);
-        faceTwoLO->setObjectName(QString::fromUtf8("faceTwoLO"));
-        faceTwoGV = new QGraphicsView(centralWidget);
-        faceTwoGV->setObjectName(QString::fromUtf8("faceTwoGV"));
-
-        faceTwoLO->addWidget(faceTwoGV);
-
-        faceTwoLE = new QLineEdit(centralWidget);
-        faceTwoLE->setObjectName(QString::fromUtf8("faceTwoLE"));
-
-        faceTwoLO->addWidget(faceTwoLE);
-
-        saveFaceTwoPB = new QPushButton(centralWidget);
-        saveFaceTwoPB->setObjectName(QString::fromUtf8("saveFaceTwoPB"));
-
-        faceTwoLO->addWidget(saveFaceTwoPB);
-
-
-        horizontalLayout->addLayout(faceTwoLO);
-
 
         horizontalLayout_2->addLayout(horizontalLayout);
 
@@ -153,7 +122,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 669, 20));
+        menuBar->setGeometry(QRect(0, 0, 329, 20));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -170,11 +139,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
-        capturePB->setText(QApplication::translate("MainWindow", "Start/Stop Capture", 0, QApplication::UnicodeUTF8));
         faceDetectPB->setText(QApplication::translate("MainWindow", "Detect Face", 0, QApplication::UnicodeUTF8));
         showLivePB->setText(QApplication::translate("MainWindow", "Show Live", 0, QApplication::UnicodeUTF8));
         saveFaceOnePB->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
-        saveFaceTwoPB->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
