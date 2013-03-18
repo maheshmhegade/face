@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    facemodeltostore = 0;
+//    facemodeltostore = 0;
     liveVideoObject.initliveVideo();
     ui->setupUi(this);
 }
@@ -20,23 +20,27 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_saveFaceOnePB_clicked()
 {
+/*
     Tlddatabase *tlddatabase = new Tlddatabase;
     facemodeltostore->Name = ui->faceOneLE->text();
     tlddatabase->insertFaceModel(facemodeltostore);
     delete tlddatabase;
-
+*/
 }
 
 void MainWindow::on_saveFaceTwoPB_clicked()
 {
+/*
     Tlddatabase *tlddatabase = new Tlddatabase;
     facemodeltostore->Name = ui->faceTwoLE->text();
     tlddatabase->insertFaceModel(facemodeltostore);
     delete tlddatabase;
+*/
 }
 
 void MainWindow::on_capturePB_clicked()
 {
+/*
     if (liveVideoObject.playStatus == false)
     {
         liveVideoObject.togglePlayStatus();
@@ -47,11 +51,12 @@ void MainWindow::on_capturePB_clicked()
         liveVideoObject.togglePlayStatus();
         liveVideoObject.stopCapture();
     }
+*/
 }
 
 void MainWindow::on_faceDetectPB_clicked()
 {
-
+/*
     liveVideoObject.detectFace(ui->faceOneGV,ui->faceTwoGV,boundingBox);
 
     liveVideoObject.togglePlayStatus();
@@ -60,12 +65,12 @@ void MainWindow::on_faceDetectPB_clicked()
     facemodeltostore = tmpTLD->getModeltoStore(boundingBox);
     cout << facemodeltostore->minVar << endl;
     delete tmpTLD;
-
+*/
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-
+/*
     Tlddatabase *tlddatabase = new Tlddatabase();
 
     for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
@@ -76,11 +81,12 @@ void MainWindow::on_pushButton_clicked()
         delete tmpTLD;
     }
     delete tlddatabase;
-
+*/
 }
 
 void MainWindow::on_showLivePB_clicked()
 {
+/*
     Tlddatabase *tlddatabase = new Tlddatabase();
 
     for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
@@ -91,5 +97,5 @@ void MainWindow::on_showLivePB_clicked()
         delete tmpTLD;
     }
     delete tlddatabase;
-
+*/
 }

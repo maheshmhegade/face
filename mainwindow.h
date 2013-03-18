@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 #include "livevideo.h"
-#include "tlddatabase.h"
+//#include "tlddatabase.h"
 
-using namespace libface;
+//using namespace libface;
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
     
 public:
     int boundingBox[4];
-    unitFaceModel* facemodeltostore;
+//    unitFaceModel* facemodeltostore;
     liveVideo liveVideoObject;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
