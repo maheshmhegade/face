@@ -197,6 +197,8 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
 
     numTrainImages = 0;
 
+    int recognCount = 0;
+
     while(imAcqHasMoreFrames(imAcq) && numTrainImages < 150)
     {
         numTrainImages++;
@@ -217,6 +219,20 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
         tld->processImage(img);
 
         int confident = (tld->currConf >= threshold) ? 1 : 0;
+
+        if(tld->currConf > 0.0)
+        {
+            recognCount = 0;
+        }
+        else if(tld->currConf == 0.0)
+        {
+        recognCount++;
+        }
+
+        if(recognCount > 30)
+        {
+            return 0.0;
+        }
 
         if(showOutput || saveDir != NULL)
         {

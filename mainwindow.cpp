@@ -40,16 +40,25 @@ void MainWindow::on_faceDetectPB_clicked()
 
 void MainWindow::on_showLivePB_clicked()
 {
-    Tlddatabase *tlddatabase = new Tlddatabase();
+    liveVideoObject->togglePlayStatus();
 
-    QList<unitFaceModel*> comparemodels;
-
-    for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
+    if(liveVideoObject->playStatus == true)
     {
-        comparemodels.push_back(tlddatabase->getFaceModel(i));
+        Tlddatabase *tlddatabase = new Tlddatabase();
+
+        QList<unitFaceModel*> comparemodels;
+
+        for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
+        {
+            comparemodels.push_back(tlddatabase->getFaceModel(i));
+        }
+        delete tlddatabase;
+
+        while(liveVideoObject->playStatus == true)
+        {
+            Tldrecognition* const tmpTLD      = new Tldrecognition;
+            tmpTLD->getRecognitionConfidence(comparemodels);
+            delete tmpTLD;
+        }
     }
-    delete tlddatabase;
-    Tldrecognition* const tmpTLD      = new Tldrecognition;
-    tmpTLD->getRecognitionConfidence(comparemodels);
-    delete tmpTLD;
 }
