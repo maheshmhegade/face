@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow
     
 public:
     int boundingBox[4];
+    pair<unitFaceModel*,IplImage*> faceData;
     unitFaceModel* facemodeltostore;
     liveVideo *liveVideoObject;
     explicit MainWindow(QWidget *parent = 0);

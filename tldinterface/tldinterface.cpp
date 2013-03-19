@@ -34,7 +34,10 @@ using namespace cv;
 
 pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 {
-    showOutput = false;
+    unitFaceModel * facemodel;
+    IplImage *faceToDisplay;
+
+    showOutput = 0;
     IplImage *img;
     for (int i = 0 ;i < 2 ;i++)//intentionally introduced delay to get clear image
     {
@@ -50,6 +53,12 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
                                     tmpStorageFaceDetect,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
 
     CvRect * tmpFaceLocation = (CvRect *)cvGetSeqElem(allFaces,0);
+
+    if (allFaces->total == 0)
+    {
+        return make_pair(facemodel,img);
+    }
+
     int boundingBox[4];
     boundingBox[0] = tmpFaceLocation->x;
     boundingBox[1] = tmpFaceLocation->y;
@@ -57,7 +66,7 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
     boundingBox[3] = tmpFaceLocation->height;
 
     cvSetImageROI( img,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
-    IplImage *faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),img->depth,
+    faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),img->depth,
                                             img->nChannels);
     cvCopy(img,faceToDisplay);
     cvResetImageROI(img);
@@ -80,7 +89,7 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
     reuseFrameOnce = true;
 
     int numTrainImages = 0;
-    while(imAcqHasMoreFrames(imAcq) && numTrainImages < 30)
+    while(numTrainImages < 30)
     {
         numTrainImages++;
         double tic = cvGetTickCount();
@@ -120,11 +129,11 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
             reuseFrameOnce = false;
         }
     }
-    unitFaceModel *facemodel = tld->putObjModel();
+    facemodel = tld->putObjModel();
     return make_pair(facemodel,faceToDisplay);
 }
 
-float tldinterface::getrecognitionconfidence(unitFaceModel * const comparemodel)
+float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodels)
 {
     IplImage *img = imAcqGetImg(imAcq);
     Mat grey(img->height, img->width, CV_8UC1);
@@ -135,22 +144,62 @@ float tldinterface::getrecognitionconfidence(unitFaceModel * const comparemodel)
     tld->detectorCascade->imgWidthStep = grey.step;
 
     bool reuseFrameOnce = false;
-    bool skipProcessingOnce = false;
 
     char facename[15] = "";
-    strcpy(facename ,qPrintable(comparemodel->Name));
 
-    tld->getObjModel(comparemodel);
-    reuseFrameOnce = true;
+    reuseFrameOnce = false;
 
     char string[128];
 
 
     int numTrainImages = 0;
+
+    float maxconf = 0.0;
+
+    for(int i = 0 ; i < comparemodels.size(); i++ )
+    {
+        strcpy(facename ,qPrintable(comparemodels.at(i)->Name));
+        tld->getObjModel(comparemodels.at(i));
+
+        numTrainImages = 0;
+        while(imAcqHasMoreFrames(imAcq) && numTrainImages < 5)
+        {
+            numTrainImages++;
+            if(!reuseFrameOnce)
+            {
+                img = imAcqGetImg(imAcq);
+
+                if(img == NULL)
+                {
+                    printf("current image is NULL, assuming end of input.\n");
+                    break;
+                }
+
+                cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
+            }
+
+            tld->processImage(img);
+            if(tld->currConf > maxconf)
+            {
+                maxconf = tld->currConf;
+            }
+        }
+        if(maxconf > 0.0)
+        {
+            break;
+        }
+    }
+
+    if(maxconf == 0.0)
+    {
+        return 0.0;
+    }
+
+    numTrainImages = 0;
+
     while(imAcqHasMoreFrames(imAcq) && numTrainImages < 150)
     {
         numTrainImages++;
-        double tic = cvGetTickCount();
 
         if(!reuseFrameOnce)
         {
@@ -165,26 +214,21 @@ float tldinterface::getrecognitionconfidence(unitFaceModel * const comparemodel)
             cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
         }
 
-        if(!skipProcessingOnce)
-        {
-            tld->processImage(img);
-        }
-        else
-        {
-            skipProcessingOnce = false;
-        }
-
-        double toc = (cvGetTickCount() - tic) / cvGetTickFrequency();
-
-        toc = toc / 1000000;
-
-        float fps = 1 / toc;
+        tld->processImage(img);
 
         int confident = (tld->currConf >= threshold) ? 1 : 0;
 
         if(showOutput || saveDir != NULL)
         {
-            sprintf(string, "Hey %s Are you infront of me???", facename);
+
+            if(tld->currConf > 0.0)
+            {
+                sprintf(string, "Hey %s Are you infront of me???", facename);
+            }
+            else
+            {
+                sprintf(string,"Not Recognised");
+            }
             CvScalar yellow = CV_RGB(255, 255, 0);
             CvScalar blue = CV_RGB(0, 0, 255);
             CvScalar black = CV_RGB(0, 0, 0);
@@ -219,63 +263,6 @@ float tldinterface::getrecognitionconfidence(unitFaceModel * const comparemodel)
                 char key = gui->getKey();
 
                 if(key == 'q') break;
-
-                if(key == 'b')
-                {
-
-                    ForegroundDetector *fg = tld->detectorCascade->foregroundDetector;
-
-                    if(fg->bgImg.empty())
-                    {
-                        fg->bgImg = grey.clone();
-                    }
-                    else
-                    {
-                        fg->bgImg.release();
-                    }
-                }
-
-                if(key == 'c')
-                {
-                    //clear everything
-                    tld->release();
-                }
-
-                if(key == 'l')
-                {
-                    tld->learningEnabled = !tld->learningEnabled;
-                    printf("LearningEnabled: %d\n", tld->learningEnabled);
-                }
-
-                if(key == 'a')
-                {
-                    tld->alternating = !tld->alternating;
-                    printf("alternating: %d\n", tld->alternating);
-                }
-
-                if(key == 'e')
-                {
-                    tld->writeToFile(modelExportFile);
-                }
-
-                if(key == 'i')
-                {
-                    tld->readFromFile(modelPath);
-                }
-
-                if(key == 'r')
-                {
-                    CvRect box;
-
-                    if(getBBFromUser(img, box, gui) == PROGRAM_EXIT)
-                    {
-                        break;
-                    }
-
-                    Rect r = Rect(box);
-
-                    tld->selectObject(grey, &r);
-                }
             }
         }
 

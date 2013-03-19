@@ -21,6 +21,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_saveFaceOnePB_clicked()
 {
     Tlddatabase *tlddatabase = new Tlddatabase;
+    facemodeltostore = faceData.first;
     facemodeltostore->Name = ui->faceOneLE->text();
     cout << qPrintable(facemodeltostore->Name) << endl;
     tlddatabase->insertFaceModel(facemodeltostore);
@@ -31,8 +32,8 @@ void MainWindow::on_saveFaceOnePB_clicked()
 void MainWindow::on_faceDetectPB_clicked()
 {
     Tldrecognition* const tmpTLD          = new Tldrecognition;
-    pair<unitFaceModel*,IplImage*> faceData = tmpTLD->getModeltoStore();
-    facemodeltostore = faceData.first;
+    faceData = tmpTLD->getModeltoStore();
+    //facemodeltostore = faceData.first;
     liveVideoObject->displayVideo(faceData.second,ui->faceOneGV);
     delete tmpTLD;
 }
@@ -41,14 +42,14 @@ void MainWindow::on_showLivePB_clicked()
 {
     Tlddatabase *tlddatabase = new Tlddatabase();
 
+    QList<unitFaceModel*> comparemodels;
+
     for (int i = 1; i <= tlddatabase->queryNumfacesinDatabase();i++ )
     {
-        unitFaceModel* const comparemodel = tlddatabase->getFaceModel(i);
-        cout << qPrintable(comparemodel->Name)<< endl;
-        Tldrecognition* const tmpTLD      = new Tldrecognition;
-        tmpTLD->getRecognitionConfidence(comparemodel);
-        delete tmpTLD;
+        comparemodels.push_back(tlddatabase->getFaceModel(i));
     }
     delete tlddatabase;
-
+    Tldrecognition* const tmpTLD      = new Tldrecognition;
+    tmpTLD->getRecognitionConfidence(comparemodels);
+    delete tmpTLD;
 }
