@@ -1,6 +1,12 @@
 face
 ====
 
+packages needed 
+qt-creator(including QtSql driver)
+opencv
+cmake
+sqlite3
+
 Live Face Recognition from Webcam
 
 Store Faces in a database and this software recognises person infront of the camera
