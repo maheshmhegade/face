@@ -54,11 +54,8 @@ void MainWindow::on_showLivePB_clicked()
         }
         delete tlddatabase;
 
-        while(liveVideoObject->playStatus == true)
-        {
-            Tldrecognition* const tmpTLD      = new Tldrecognition;
-            tmpTLD->getRecognitionConfidence(comparemodels);
-            delete tmpTLD;
-        }
+        Tldrecognition* const tmpTLD      = new Tldrecognition;
+        tmpTLD->getRecognitionConfidence(comparemodels);
+        delete tmpTLD;
     }
 }

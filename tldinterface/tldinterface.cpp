@@ -67,7 +67,7 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 
     cvSetImageROI( img,cvRect( tmpFaceLocation->x,tmpFaceLocation->y,tmpFaceLocation->width,tmpFaceLocation->height ) );
     faceToDisplay = cvCreateImage(cvSize( tmpFaceLocation->width,tmpFaceLocation->height),img->depth,
-                                            img->nChannels);
+                                  img->nChannels);
     cvCopy(img,faceToDisplay);
     cvResetImageROI(img);
 
@@ -136,6 +136,12 @@ pair<unitFaceModel *,IplImage *> tldinterface::generatefacemodel()
 float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodels)
 {
     IplImage *img = imAcqGetImg(imAcq);
+    for (int i = 0 ;i < 2 ;i++)//intentionally introduced delay to get clear image
+    {
+        img = imAcqGetImg(imAcq);
+        cvWaitKey(30);
+    }
+
     Mat grey(img->height, img->width, CV_8UC1);
     cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
 
@@ -156,15 +162,58 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
 
     float maxconf = 0.0;
 
-    for(int i = 0 ; i < comparemodels.size(); i++ )
+    char key;
+
+    while(key != 'q')
     {
-        strcpy(facename ,qPrintable(comparemodels.at(i)->Name));
-        tld->getObjModel(comparemodels.at(i));
+
+        for(int i = 0 ; i < comparemodels.size(); i++ )
+        {
+            strcpy(facename ,qPrintable(comparemodels.at(i)->Name));
+            tld->getObjModel(comparemodels.at(i));
+
+            numTrainImages = 0;
+            while(imAcqHasMoreFrames(imAcq) && numTrainImages < 5)
+            {
+                numTrainImages++;
+                if(!reuseFrameOnce)
+                {
+                    img = imAcqGetImg(imAcq);
+
+                    if(img == NULL)
+                    {
+                        printf("current image is NULL, assuming end of input.\n");
+                        break;
+                    }
+
+                    cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
+                }
+
+                tld->processImage(img);
+                if(tld->currConf > maxconf)
+                {
+                    maxconf = tld->currConf;
+                }
+            }
+            if(maxconf > 0.0)
+            {
+                break;
+            }
+        }
+
+        if(maxconf == 0.0)
+        {
+            return 0.0;
+        }
 
         numTrainImages = 0;
-        while(imAcqHasMoreFrames(imAcq) && numTrainImages < 5)
+
+        int recognCount = 0;
+
+        while(key != 'q')
         {
             numTrainImages++;
+
             if(!reuseFrameOnce)
             {
                 img = imAcqGetImg(imAcq);
@@ -179,122 +228,80 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
             }
 
             tld->processImage(img);
-            if(tld->currConf > maxconf)
-            {
-                maxconf = tld->currConf;
-            }
-        }
-        if(maxconf > 0.0)
-        {
-            break;
-        }
-    }
 
-    if(maxconf == 0.0)
-    {
-        return 0.0;
-    }
-
-    numTrainImages = 0;
-
-    int recognCount = 0;
-
-    while(imAcqHasMoreFrames(imAcq) && numTrainImages < 150)
-    {
-        numTrainImages++;
-
-        if(!reuseFrameOnce)
-        {
-            img = imAcqGetImg(imAcq);
-
-            if(img == NULL)
-            {
-                printf("current image is NULL, assuming end of input.\n");
-                break;
-            }
-
-            cvtColor(cv::Mat(img), grey, CV_BGR2GRAY);
-        }
-
-        tld->processImage(img);
-
-        int confident = (tld->currConf >= threshold) ? 1 : 0;
-
-        if(tld->currConf > 0.0)
-        {
-            recognCount = 0;
-        }
-        else if(tld->currConf == 0.0)
-        {
-        recognCount++;
-        }
-
-        if(recognCount > 30)
-        {
-            return 0.0;
-        }
-
-        if(showOutput || saveDir != NULL)
-        {
+            int confident = (tld->currConf >= threshold) ? 1 : 0;
 
             if(tld->currConf > 0.0)
             {
-                sprintf(string, "Hey %s Are you infront of me???", facename);
+                recognCount = 0;
+            }
+            else if(tld->currConf == 0.0)
+            {
+                recognCount++;
+            }
+
+            if(recognCount > 30)
+            {
+                break;
+            }
+
+            if(showOutput || saveDir != NULL)
+            {
+
+                if(tld->currConf > 0.0)
+                {
+                    sprintf(string, "Hey %s Are you infront of me???", facename);
+                }
+                else
+                {
+                    sprintf(string,"Not Recognised");
+                }
+                CvScalar yellow = CV_RGB(255, 255, 0);
+                CvScalar blue = CV_RGB(0, 0, 255);
+                CvScalar black = CV_RGB(0, 0, 0);
+                CvScalar white = CV_RGB(255, 255, 255);
+
+                if(tld->currBB != NULL)
+                {
+                    CvScalar rectangleColor = (confident) ? blue : yellow;
+                    cvRectangle(img, tld->currBB->tl(), tld->currBB->br(), rectangleColor, 8, 8, 0);
+                }
+
+                CvFont font;
+                cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, .5, .5, 0, 1, 8);
+                cvRectangle(img, cvPoint(0, 0), cvPoint(img->width, 50), black, CV_FILLED, 8, 0);
+                cvPutText(img, string, cvPoint(25, 25), &font, white);
+
+                if(showForeground)
+                {
+
+                    for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList->size(); i++)
+                    {
+                        Rect r = tld->detectorCascade->detectionResult->fgList->at(i);
+                        cvRectangle(img, r.tl(), r.br(), white, 1);
+                    }
+
+                }
+
+
+                if(showOutput)
+                {
+                    gui->showImage(img);
+                    key = gui->getKey();
+
+                    if(key == 'q') break;
+                }
+            }
+
+            if(!reuseFrameOnce)
+            {
+                cvReleaseImage(&img);
             }
             else
             {
-                sprintf(string,"Not Recognised");
-            }
-            CvScalar yellow = CV_RGB(255, 255, 0);
-            CvScalar blue = CV_RGB(0, 0, 255);
-            CvScalar black = CV_RGB(0, 0, 0);
-            CvScalar white = CV_RGB(255, 255, 255);
-
-            if(tld->currBB != NULL)
-            {
-                CvScalar rectangleColor = (confident) ? blue : yellow;
-                cvRectangle(img, tld->currBB->tl(), tld->currBB->br(), rectangleColor, 8, 8, 0);
-            }
-
-            CvFont font;
-            cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, .5, .5, 0, 1, 8);
-            cvRectangle(img, cvPoint(0, 0), cvPoint(img->width, 50), black, CV_FILLED, 8, 0);
-            cvPutText(img, string, cvPoint(25, 25), &font, white);
-
-            if(showForeground)
-            {
-
-                for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList->size(); i++)
-                {
-                    Rect r = tld->detectorCascade->detectionResult->fgList->at(i);
-                    cvRectangle(img, r.tl(), r.br(), white, 1);
-                }
-
-            }
-
-
-            if(showOutput)
-            {
-                gui->showImage(img);
-                char key = gui->getKey();
-
-                if(key == 'q') break;
+                reuseFrameOnce = false;
             }
         }
-
-        if(!reuseFrameOnce)
-        {
-            cvReleaseImage(&img);
-        }
-        else
-        {
-            reuseFrameOnce = false;
-        }
-    }
-
-    if(exportModelAfterRun)
-    {
-        //        tld->writeToFile(modelExportFile);
     }
     return 0.34;
 }
