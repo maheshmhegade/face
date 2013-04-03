@@ -162,7 +162,7 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
 
     float maxconf = 0.0;
 
-    char key;
+    char key = 's';
 
     while(key != 'q')
     {
@@ -173,12 +173,15 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
             tld->getObjModel(comparemodels.at(i));
 
             numTrainImages = 0;
-            while(imAcqHasMoreFrames(imAcq) && numTrainImages < 5)
+            while(imAcqHasMoreFrames(imAcq) && numTrainImages < 5 || key == 'q')
             {
                 numTrainImages++;
                 if(!reuseFrameOnce)
                 {
                     img = imAcqGetImg(imAcq);
+
+                    gui->showImage(img);
+                    key = gui->getKey();
 
                     if(img == NULL)
                     {
@@ -195,7 +198,7 @@ float tldinterface::getrecognitionconfidence(QList<unitFaceModel *> comparemodel
                     maxconf = tld->currConf;
                 }
             }
-            if(maxconf > 0.0)
+            if(maxconf > 0.0 || key == 'q')
             {
                 break;
             }
